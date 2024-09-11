@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="ECC2025",
-    version="0.1.1",
+    version="0.1.2",
     description="ECC2025",
     url="https://github.com/LucianoPereiraValenzuela/ECC_2025_testing",
     author="Luciano Pereira",
