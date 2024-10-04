@@ -84,22 +84,61 @@ def test_2( qc_ghz_op ):
         else:
             print( 'El error de tu circuito es mayor!')
 
-def test_3( Fourier ):
+def test_3a( Fourier ):
 
     sol = False 
     if not isfunction( Fourier ):
         print('Input no es una función')
     else:
         for num_qubits in range(2,6):
+
+            F = np.exp( 2j*np.pi*np.outer( np.arange(2**num_qubits), np.arange(2**num_qubits) )/2**num_qubits  ) / np.sqrt(2**num_qubits)
+
             qc = Fourier( num_qubits )
-            F = np.exp( - 2j*np.pi*np.outer(np.arange(2**num_qubits), 
-                                    np.arange(2**num_qubits))/2**num_qubits ) / np.sqrt(2**num_qubits)
             if not np.isclose( np.linalg.norm( F-Operator(qc).to_matrix() ), 0 ) :
                 sol = False 
                 print( 'La función no implementa la transformada de Fourier para {} qubits'.format(num_qubits) )
                 break
             else:
                 sol = True 
+
+    if sol: 
+        print('Felicidades, tu solución es correcta!')
+
+
+def test_3b( U_to_n ):
+    sol = False 
+    for power in range(1,6):
+        U1 = np.diag([1,1,1,np.exp(power*1j*2*np.pi*0.375)])
+        U2 = Operator( U_to_n(power) ).to_matrix() 
+        if not np.isclose( np.linalg.norm( U1-U2 ), 0 ) :
+            sol = False 
+            print( 'La función no implementa '+'$U^n$'+' para potencia {}'.format(power) )
+            break
+        else:
+            sol = True 
+
+    if sol: 
+        print('Felicidades, tu solución es correcta!')
+
+
+def test_3c( QuantumPhaseEstimation ):
+
+    sol = False
+    for num_qubits in range(3,6):
+        phi = 0.375 
+        qc = QuantumPhaseEstimation(num_qubits)
+        backend = AerSimulator()
+        job = backend.run( qc )
+        counts = job.result().get_counts()
+        phi_hat = int( max(counts ), 2 ) / 2**num_qubits
+        if not np.isclose( np.abs(phi_hat-phi), 0 ) :
+            sol = False 
+            print( 'La función no estima correctamente la fase para {} qubits'.format(num_qubits) )
+            print( u'$\tilde\phi=$'+'{}'.format(phi_hat))
+            break
+        else:
+            sol = True 
 
     if sol: 
         print('Felicidades, tu solución es correcta!')
