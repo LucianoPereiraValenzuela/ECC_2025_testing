@@ -113,7 +113,7 @@ def test_3b( U_to_n ):
         U2 = Operator( U_to_n(power) ).to_matrix() 
         if not np.isclose( np.linalg.norm( U1-U2 ), 0 ) :
             sol = False 
-            print( 'La función no implementa '+'$U^n$'+' para potencia {}'.format(power) )
+            print( 'La función no implementa '+r'$U^n$'+' para potencia {}'.format(power) )
             break
         else:
             sol = True 
@@ -135,7 +135,7 @@ def test_3c( QuantumPhaseEstimation ):
         if not np.isclose( np.abs(phi_hat-phi), 0 ) :
             sol = False 
             print( 'La función no estima correctamente la fase para {} qubits'.format(num_qubits) )
-            print( u'$\tilde\phi=$'+'{}'.format(phi_hat))
+            print( r'$\tilde\phi=$'+'{}'.format(phi_hat))
             break
         else:
             sol = True 
