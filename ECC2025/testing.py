@@ -84,7 +84,7 @@ def test_2( qc_ghz_op ):
         else:
             print( 'El error de tu circuito es mayor!')
 
-def test_3a( Fourier ):
+def test_2a( Fourier ):
 
     sol = False 
     if not isfunction( Fourier ):
@@ -106,7 +106,7 @@ def test_3a( Fourier ):
         print('Felicidades, tu solución es correcta!')
 
 
-def test_3b( U_to_n ):
+def test_2b( U_to_n ):
     sol = False 
     for power in range(1,6):
         U1 = np.diag([1,1,1,np.exp(power*1j*2*np.pi*0.375)])
@@ -122,7 +122,7 @@ def test_3b( U_to_n ):
         print('Felicidades, tu solución es correcta!')
 
 
-def test_3c( QuantumPhaseEstimation ):
+def test_2c( QuantumPhaseEstimation ):
 
     sol = False
     for num_qubits in range(3,6):
@@ -142,3 +142,154 @@ def test_3c( QuantumPhaseEstimation ):
 
     if sol: 
         print('Felicidades, tu solución es correcta!')
+
+####################################
+
+def test_3a( Aj, Bk ):
+
+       A = np.zeros((3,2,2), dtype=complex)
+       B = np.zeros((3,2,2), dtype=complex)
+
+       A[0] = np.array([[1.+0.j, 0.+0.j],
+              [0.+0.j, 1.+0.j]])
+       A[1] = np.array([[ 0.92387953+0.j,  0.38268343+0.j],
+              [-0.38268343+0.j,  0.92387953+0.j]])
+       A[2] = np.array([[ 0.70710678+0.j,  0.70710678+0.j],
+              [-0.70710678+0.j,  0.70710678+0.j]])
+       B[0] = np.array([[ 0.92387953+0.j,  0.38268343+0.j],
+              [-0.38268343+0.j,  0.92387953+0.j]])
+       B[1] = np.array([[ 0.70710678+0.j,  0.70710678+0.j],
+              [-0.70710678+0.j,  0.70710678+0.j]])
+       B[2] = np.array([[ 0.38268343+0.j,  0.92387953+0.j],
+              [-0.92387953+0.j,  0.38268343+0.j]])
+       
+       sol = True
+       for j, a in enumerate(Aj):
+              if a.num_qubits > 1:
+                     print('Los circuitos deben tener 1 qubit')
+              if np.isclose( np.linalg.norm( Operator(a).to_matrix() - A[j] ), 0 ):
+                     pass
+              else:
+                     sol = False 
+                     print('El circuito {} de Alice no es correcto'.format(j))
+
+       for k, b in enumerate(Bk):
+              if b.num_qubits > 1:
+                     print('Los circuitos deben tener 1 qubit')
+              if np.isclose( np.linalg.norm( Operator(b).to_matrix() - B[k] ), 0 ):
+                     pass
+              else:
+                     sol = False
+                     print('El circuito {} de Bob no es correcto'.format(k) )
+
+       if sol:
+              print('Felicitaciones, tu solución es correcta!')
+
+def test_3b( qcs ):
+    Ops_2qb = np.array([[[ 2.70598050e-01+0.j,  2.70598050e-01+0.j,  6.53281482e-01+0.j,
+          6.53281482e-01+0.j],
+        [-6.53281482e-01+0.j,  6.53281482e-01+0.j, -2.70598050e-01+0.j,
+          2.70598050e-01+0.j],
+        [ 6.53281482e-01+0.j,  6.53281482e-01+0.j, -2.70598050e-01+0.j,
+         -2.70598050e-01+0.j],
+        [ 2.70598050e-01+0.j, -2.70598050e-01+0.j, -6.53281482e-01+0.j,
+          6.53281482e-01+0.j]],
+
+       [[ 5.00000000e-01+0.j,  5.00000000e-01+0.j,  5.00000000e-01+0.j,
+          5.00000000e-01+0.j],
+        [-5.00000000e-01+0.j,  5.00000000e-01+0.j, -5.00000000e-01+0.j,
+          5.00000000e-01+0.j],
+        [ 5.00000000e-01+0.j,  5.00000000e-01+0.j, -5.00000000e-01+0.j,
+         -5.00000000e-01+0.j],
+        [ 5.00000000e-01+0.j, -5.00000000e-01+0.j, -5.00000000e-01+0.j,
+          5.00000000e-01+0.j]],
+
+       [[ 6.53281482e-01+0.j,  6.53281482e-01+0.j,  2.70598050e-01+0.j,
+          2.70598050e-01+0.j],
+        [-2.70598050e-01+0.j,  2.70598050e-01+0.j, -6.53281482e-01+0.j,
+          6.53281482e-01+0.j],
+        [ 2.70598050e-01+0.j,  2.70598050e-01+0.j, -6.53281482e-01+0.j,
+         -6.53281482e-01+0.j],
+        [ 6.53281482e-01+0.j, -6.53281482e-01+0.j, -2.70598050e-01+0.j,
+          2.70598050e-01+0.j]],
+
+       [[ 2.77555756e-17+0.j,  5.00000000e-01+0.j,  5.00000000e-01+0.j,
+          7.07106781e-01+0.j],
+        [-7.07106781e-01+0.j,  5.00000000e-01+0.j, -5.00000000e-01+0.j,
+          2.77555756e-17+0.j],
+        [ 7.07106781e-01+0.j,  5.00000000e-01+0.j, -5.00000000e-01+0.j,
+         -2.77555756e-17+0.j],
+        [ 2.77555756e-17+0.j, -5.00000000e-01+0.j, -5.00000000e-01+0.j,
+          7.07106781e-01+0.j]],
+
+       [[ 2.70598050e-01+0.j,  6.53281482e-01+0.j,  2.70598050e-01+0.j,
+          6.53281482e-01+0.j],
+        [-6.53281482e-01+0.j,  2.70598050e-01+0.j, -6.53281482e-01+0.j,
+          2.70598050e-01+0.j],
+        [ 6.53281482e-01+0.j,  2.70598050e-01+0.j, -6.53281482e-01+0.j,
+         -2.70598050e-01+0.j],
+        [ 2.70598050e-01+0.j, -6.53281482e-01+0.j, -2.70598050e-01+0.j,
+          6.53281482e-01+0.j]],
+
+       [[ 5.00000000e-01+0.j,  7.07106781e-01+0.j,  5.55111512e-17+0.j,
+          5.00000000e-01+0.j],
+        [-5.00000000e-01+0.j,  5.55111512e-17+0.j, -7.07106781e-01+0.j,
+          5.00000000e-01+0.j],
+        [ 5.00000000e-01+0.j,  5.55111512e-17+0.j, -7.07106781e-01+0.j,
+         -5.00000000e-01+0.j],
+        [ 5.00000000e-01+0.j, -7.07106781e-01+0.j, -5.55111512e-17+0.j,
+          5.00000000e-01+0.j]],
+
+       [[-2.70598050e-01+0.j,  6.53281482e-01+0.j,  2.70598050e-01+0.j,
+          6.53281482e-01+0.j],
+        [-6.53281482e-01+0.j,  2.70598050e-01+0.j, -6.53281482e-01+0.j,
+         -2.70598050e-01+0.j],
+        [ 6.53281482e-01+0.j,  2.70598050e-01+0.j, -6.53281482e-01+0.j,
+          2.70598050e-01+0.j],
+        [-2.70598050e-01+0.j, -6.53281482e-01+0.j, -2.70598050e-01+0.j,
+          6.53281482e-01+0.j]],
+
+       [[ 0.00000000e+00+0.j,  7.07106781e-01+0.j,  0.00000000e+00+0.j,
+          7.07106781e-01+0.j],
+        [-7.07106781e-01+0.j,  0.00000000e+00+0.j, -7.07106781e-01+0.j,
+          0.00000000e+00+0.j],
+        [ 7.07106781e-01+0.j,  0.00000000e+00+0.j, -7.07106781e-01+0.j,
+          0.00000000e+00+0.j],
+        [ 0.00000000e+00+0.j, -7.07106781e-01+0.j,  0.00000000e+00+0.j,
+          7.07106781e-01+0.j]],
+
+       [[ 2.70598050e-01+0.j,  6.53281482e-01+0.j, -2.70598050e-01+0.j,
+          6.53281482e-01+0.j],
+        [-6.53281482e-01+0.j, -2.70598050e-01+0.j, -6.53281482e-01+0.j,
+          2.70598050e-01+0.j],
+        [ 6.53281482e-01+0.j, -2.70598050e-01+0.j, -6.53281482e-01+0.j,
+         -2.70598050e-01+0.j],
+        [ 2.70598050e-01+0.j, -6.53281482e-01+0.j,  2.70598050e-01+0.j,
+          6.53281482e-01+0.j]]])
+    
+    for j, qc in enumerate(qcs):
+        qc.remove_final_measurements()
+        is_equal = False
+        for op in Ops_2qb:
+            if np.isclose( np.linalg.norm( Operator(qc).to_matrix() - op ), 0 ):
+                is_equal = True
+        if not is_equal:
+            print( 'El circuito {} esta incorrecto'.format(j) )
+            break
+
+    if is_equal:
+        print('Felicitaciones, tu solución es correcta!')
+
+def test_3c( key, alice_random_trits, bob_random_trits  ):
+    len_key = 0
+    num_trits = len(alice_random_trits)
+    for j in range(num_trits):
+        a = alice_random_trits[j]
+        b = bob_random_trits[j]
+        if (a==1 and b==0) or (a==2 and b==1):
+            len_key = len_key + 1 
+
+    if len(key) == len_key:
+        print('Felicidades, tu clave es segura')
+    else:
+        print('La longitud de tu clave es incorrecta')
