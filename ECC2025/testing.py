@@ -267,7 +267,9 @@ def test_3b( qcs ):
         [ 2.70598050e-01+0.j, -6.53281482e-01+0.j,  2.70598050e-01+0.j,
           6.53281482e-01+0.j]]])
     
+    is_equal = False 
     for j, qc in enumerate(qcs):
+        qc = qc.copy()
         qc.remove_final_measurements()
         is_equal = False
         for op in Ops_2qb:
