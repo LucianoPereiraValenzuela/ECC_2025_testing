@@ -10,7 +10,7 @@ from qiskit import transpile
 
 ### NO MODIFICAR ###
 
-def test_1( qc_ghz_op : QuantumCircuit ):
+def test_1a( qc_ghz_op : QuantumCircuit ):
 
     qc_ghz_op = transpile( qc_ghz_op )
     n_qubits = 4 
@@ -32,7 +32,7 @@ def test_1( qc_ghz_op : QuantumCircuit ):
     else:
         print('Felicidades, tu solución es correcta!')
 
-def test_2( qc_ghz_op ):
+def test_1b( qc_ghz_op ):
 
     n_qubits = 4 
     qc_ghz_device = QuantumCircuit( n_qubits ) 
