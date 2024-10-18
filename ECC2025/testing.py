@@ -4,6 +4,8 @@ from qiskit import QuantumCircuit
 from qiskit import transpile  
 from qiskit.quantum_info import Statevector, Operator
 from qiskit.quantum_info import hellinger_distance
+from qiskit.quantum_info import SparsePauliOp, process_fidelity
+from scipy.linalg import expm
 from qiskit_ibm_runtime.fake_provider import FakeBurlingtonV2 as FakeDevice
 from qiskit_aer import AerSimulator
 from qiskit import transpile
@@ -295,3 +297,44 @@ def test_3c( key, alice_random_trits, bob_random_trits  ):
         print('Felicidades, tu clave es segura')
     else:
         print('La longitud de tu clave es incorrecta')
+
+def test_4( U_trotterize ):
+    op_list = []
+    num_qubits = 5
+    for k in range(num_qubits-1):
+        XX = num_qubits * ['I']
+        XX[ k ] = 'X'
+        XX[ k+1 ] = 'X'
+        XX = "".join(XX)  
+        
+        YY = num_qubits * ['I']
+        YY[ k ] = 'Y'
+        YY[ k+1 ] = 'Y'
+        YY = "".join(YY)  
+
+        ZZ = num_qubits * ['I']
+        ZZ[ k ] = 'Z'
+        ZZ[ k+1 ] = 'Z'
+        ZZ = "".join(ZZ) 
+        
+        op_list.append( (XX,1) )
+        op_list.append( (YY,1) )
+        op_list.append( (ZZ,1) )
+
+    H = SparsePauliOp.from_list( op_list )
+
+    def U_mh(t):
+        return expm( -1j*H.to_matrix()*t )
+
+    t_target = 1
+    U_target = Operator(U_mh(t_target))
+    m = 5
+    U_trotter = Operator( 
+                U_trotterize(t_target/m, trotter_steps=m) )
+    fidelity = process_fidelity(U_trotter, target=U_target)
+    
+    print('Fidelidad=', fidelity )
+    if fidelity >= 0.9:
+        print('Felicidades, su solución tiene una fidelidad superior al 90%')
+    else:
+        print('Su solución tiene fidelidad muy baja.')
