@@ -365,10 +365,10 @@ def test_5a( folding ):
         print('Su solución está equivocada, intenta de nuevo')
 
 def test_5b( A ):
-    A_th = np.array([[ 0.+0.j,  3.+0.j,  0.-2.j,  0.-1.j],
-                    [ 3.+0.j,  0.+0.j,  0.+1.j,  0.+2.j],
-                    [ 0.+2.j,  0.-1.j,  0.+0.j, -3.+0.j],
-                    [ 0.+1.j,  0.-2.j, -3.+0.j,  0.+0.j]])
+    A_th = np.array([[ 0.+0.j,  3.+0.j,  0.+0.j,  0.-3.j],
+                [ 3.+0.j,  0.+0.j,  0.-1.j,  0.+0.j],
+                [ 0.+0.j,  0.+1.j,  0.+0.j, -3.+0.j],
+                [ 0.+3.j,  0.+0.j, -3.+0.j,  0.+0.j]])
     
     if str(type(A)) == "<class 'qiskit.quantum_info.operators.symplectic.sparse_pauli_op.SparsePauliOp'>" :
         if np.isclose( A, A_th ).all():
