@@ -9,6 +9,8 @@ from scipy.linalg import expm
 from qiskit_ibm_runtime.fake_provider import FakeBurlingtonV2 as FakeDevice
 from qiskit_aer import AerSimulator
 from qiskit import transpile
+from qiskit.circuit import random_circuit
+
 
 ### NO MODIFICAR ###
 
@@ -278,7 +280,7 @@ def test_3b( qcs ):
             if np.isclose( np.linalg.norm( Operator(qc).to_matrix() - op ), 0 ):
                 is_equal = True
         if not is_equal:
-            print( 'El circuito {} esta incorrecto'.format(j) )
+            print( 'El circuito {} está incorrecto'.format(j) )
             break
 
     if is_equal:
@@ -338,3 +340,104 @@ def test_4( U_trotterize ):
         print('Felicidades, su solución tiene una fidelidad superior al 90%')
     else:
         print('Su solución tiene fidelidad muy baja.')
+
+#####################################
+def test_5a( folding ):
+    sol = True
+    for num_qubit in [1,2,3]:
+        qc_U = random_circuit(num_qubit,4)
+        for N in [0,1,2,3]:
+            qc_U_N = folding( qc_U, N )
+            if qc_U.depth()*(2*N+1)==qc_U_N.depth():
+                pass
+            else:
+                sol = False
+                break
+            if np.isclose(Operator( qc_U ).to_matrix(), 
+                            Operator( qc_U_N ).to_matrix()).all():
+                pass
+            else:
+                sol=False
+                break 
+    if sol:
+        print('Felicitaciones, tu solución es correcta!')
+    else:
+        print('Su solución está equivocada, intenta de nuevo')
+
+def test_5b( A ):
+    A_th = np.array([[ 0.+0.j,  3.+0.j,  0.+0.j,  0.-3.j],
+                [ 3.+0.j,  0.+0.j,  0.-1.j,  0.+0.j],
+                [ 0.+0.j,  0.+1.j,  0.+0.j, -3.+0.j],
+                [ 0.+3.j,  0.+0.j, -3.+0.j,  0.+0.j]])
+    
+    if str(type(A)) == "<class 'qiskit.quantum_info.operators.symplectic.sparse_pauli_op.SparsePauliOp'>" :
+        if np.isclose( A, A_th ).all():
+            print('Felicitaciones, tu solución es correcta!')
+        else:
+            print('Su solución está equivocada, intenta de nuevo')
+    else:
+        print('A tiene que ser un operador SparsePauliOp')
+
+from qiskit_aer.noise import NoiseModel, depolarizing_error
+from qiskit_aer.primitives import Estimator
+from qiskit.primitives import Estimator as Estimator_ideal
+
+def test_5c( extrapolation, A, Ns, folding ):
+
+    qc_U_1 = QuantumCircuit(2)
+    qc_U_1.h(0)
+    qc_U_1.cx(0,1)
+    qc_U_1.sdg(1)
+
+    qc_U_2 = QuantumCircuit(2)
+    qc_U_2.h(0)
+    qc_U_2.cx(0,1)
+    qc_U_2.sdg(1)
+
+    sol = True
+    
+    for error in [0.1, 0.01, 0.001]:
+
+        noise_model = NoiseModel()
+        error = depolarizing_error( 0.01, 1 )
+        noise_model.add_quantum_error( error, ['x', 'h', 'u', 'y', 'z'], [0] )
+        noise_model.add_quantum_error( error, ['x', 'h', 'u', 'y', 'z'], [1] )
+
+        backend = Estimator( backend_options={'noise_model':noise_model},
+                            run_options={'shots':100000,
+                                        'seed':0 },
+                            skip_transpilation = True ) 
+        
+        backend2 = Estimator_ideal() 
+
+        for qc_U in [qc_U_1, qc_U_2]:
+            
+            obs = []
+            for n in Ns:
+                qc_U_N = folding( qc_U, n )
+                job = backend.run( qc_U_N, A )
+                obs.append( job.result().values[0] )
+
+            obs_ideal = backend2.run( qc_U, A ).result().values[0]
+
+            a, b = extrapolation( Ns, obs )
+            obs_fit = a * (2*np.array(Ns)+1) + b 
+            error_fit = np.sum( (np.array(obs)-obs_fit) )
+
+            if error_fit>0.01:
+                print('Su solución está equivocada, intenta de nuevo.')
+                sol = False
+                break
+
+            # print( obs_ideal, b )
+            if np.abs( obs_ideal - b) < 0.09 :
+                pass
+            else:
+                print('Su solución está equivocada, intenta de nuevo.')
+                sol = False
+                break  
+        if not sol:
+            break
+            
+    if sol:
+        print('Tu solución esta correcta!')   
