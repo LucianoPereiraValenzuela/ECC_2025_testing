@@ -12,5 +12,6 @@ setup(
     license="Apache 2.0",
     packages=["ECC2025"],
     install_requires=["numpy", "scipy", "qiskit", "qiskit_ibm_runtime", 
-                        "qiskit_aer", "pylatexenc", "matplotlib"],
+                        "qiskit_aer", "pylatexenc", "matplotlib",
+                        "sklearn", "pandas"],
 )
