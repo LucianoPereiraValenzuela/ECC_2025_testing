@@ -13,5 +13,5 @@ setup(
     packages=["ECC2025"],
     install_requires=["numpy", "scipy", "qiskit", "qiskit_ibm_runtime", 
                         "qiskit_aer", "pylatexenc", "matplotlib",
-                        "sklearn", "pandas"],
+                        "scikit-learn", "pandas"],
 )
