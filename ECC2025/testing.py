@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt 
 from inspect import isfunction
 from qiskit import QuantumCircuit
 from qiskit import transpile  
@@ -10,6 +11,8 @@ from qiskit_ibm_runtime.fake_provider import FakeBurlingtonV2 as FakeDevice
 from qiskit_aer import AerSimulator
 from qiskit import transpile
 from qiskit.circuit import random_circuit
+from qiskit_algorithms import VQE
+from qiskit_algorithms.optimizers import COBYLA
 
 
 ### NO MODIFICAR ###
@@ -441,3 +444,117 @@ def test_5c( extrapolation, A, Ns, folding ):
             
     if sol:
         print('Tu solución esta correcta!')   
+
+######################################3
+
+def test_6a(H_Schwinger):
+
+    def matrix_th_2q(m):
+        M = np.diag([0,-m,m,0])
+        M[1,2] = M[2,1] = 2 
+        return M
+
+    sol = True
+    for m in range(-10,10, 20):
+        H = H_Schwinger( 2, m )
+        if not np.isclose( H.to_matrix(), matrix_th_2q(m) ).all():
+            print('El Hamiltoniano esta incorrecto')
+            sol = False
+            break
+    if sol:
+        print('Felicidades, tu Hamiltoniano esta correcto!')
+
+
+
+def test_6b(H_Schwinger,var_ansatz):
+    
+    sol = True
+    if var_ansatz.num_parameters == 0 :
+        print('Tu circuito no tiene parametros.')
+        sol = False 
+
+    for op in var_ansatz.count_ops().keys():
+        if op in ['ry', 'cx']:
+            pass
+        else:
+            print('Estas usando una puerta no permitida.')
+
+    def VQE4Schwinger( m, plot=True ):
+
+        if var_ansatz.num_parameters == 0 :
+            E = 0
+        else:
+            np.random.seed(0)
+            H = H_Schwinger( 4, m )
+            optimizer = COBYLA(maxiter=500)
+
+            counts = []
+            values = []
+            def store_intermediate_result(eval_count, parameters, mean, std):
+                counts.append(eval_count)
+                values.append(mean)
+
+            quantum_solver = VQE( Estimator(), var_ansatz, optimizer, 
+                                    initial_point = 0.1*np.ones(var_ansatz.num_parameters), 
+                                    callback=store_intermediate_result )
+            result = quantum_solver.compute_minimum_eigenvalue(operator=H)
+            E = result.eigenvalue.real 
+
+            if plot:
+                plt.plot( counts, values )
+                plt.xlabel('Evaluaciones')
+                plt.ylabel('Energía')
+
+        return E
+
+    ms =  np.linspace( -5, 5, 21) 
+
+    E_np = []
+    for m in ms:
+        H = H_Schwinger( 4 , m )
+        vals, vecs = np.linalg.eigh( H.to_matrix() )
+        E_np.append(vals[0])
+    E_np = np.array(E_np)
+
+    E_vs_m = [ VQE4Schwinger(m, False) for m in ms ]
+    plt.plot( ms, E_vs_m, '-o' )
+    plt.plot( ms, E_np )
+    plt.xlabel('masa')
+    plt.ylabel('Energía')
+    plt.legend(['VQE', 'Energía Mínima'])
+
+    if np.linalg.norm( E_vs_m - E_np ) > 2:
+        print('Tu circuito variación no es suficientemente expresivo para encontrar la solución')
+        sol = False 
+
+    if sol:
+        print('Tu solución esta correcta!')
+
+
+def test_6c( H_Schwinger, CVQE4Schwinger, VQE4Schwinger ):
+    ms =  np.linspace( -5, 5, 21) 
+
+    E_np = []
+    for m in ms:
+        H = H_Schwinger( 4 , m )
+        vals, vecs = np.linalg.eigh( H.to_matrix() )
+        E_np.append(vals[:2])
+    E_np = np.array(E_np)
+
+    E_vs_m = [ VQE4Schwinger(m, False) for m in ms ]
+    E0_plus_E1_vs_m = 2*np.array([ CVQE4Schwinger(m, False) for m in ms ])
+    E1_vs_m = np.array(E0_plus_E1_vs_m) - np.array(E_vs_m)
+    plt.plot( ms, E_vs_m, ':o', color='tab:blue' )
+    plt.plot( ms, E1_vs_m, ':o', color='tab:orange' )
+    plt.plot( ms, E_np[:,0], color='tab:blue' )
+    plt.plot( ms, E_np[:,1], color='tab:orange' )
+    plt.xlabel('masa')
+    plt.ylabel('Energía')
+    plt.legend([ 'Basal VQE', 'Excitado CVQE', 
+                'Basal Exacto', 'Excitado Exacto' ]) 
+
+    if np.mean( np.abs( E_np - np.array([ E_vs_m, E1_vs_m ]).T )**2 ) > 0.7:
+        print('Tu solución esta correcta')
+    else:
+        print('Tu solución esta incorrecta.')
+
