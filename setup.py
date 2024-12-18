@@ -16,5 +16,5 @@ setup(
                         "qiskit_aer", "pylatexenc", 
                         "matplotlib", "scikit-learn", 
                         "pandas", "qiskit_algorithms",
-                        'qiskit_ibm_runtime', 'seaborn'],
+                        "seaborn" ],
     )
