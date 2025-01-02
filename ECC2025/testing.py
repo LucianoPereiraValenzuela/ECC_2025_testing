@@ -10,7 +10,7 @@ from scipy.linalg import expm
 from qiskit_ibm_runtime.fake_provider import FakeBurlingtonV2 as FakeDevice
 from qiskit_aer import AerSimulator
 from qiskit import transpile
-from qiskit.circuit import random_circuit
+from qiskit.circuit.random import random_circuit
 from qiskit_algorithms import VQE
 from qiskit_algorithms.optimizers import COBYLA
 
