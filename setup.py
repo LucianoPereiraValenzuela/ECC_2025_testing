@@ -17,5 +17,5 @@ setup(
                         "matplotlib", "scikit-learn", 
                         "pandas", "qiskit_algorithms",
                         "seaborn", "tensorflow", 
-                        "keras"],
+                        "keras", "pyscf", "qiskit_nature"],
     )
